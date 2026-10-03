@@ -129,4 +129,22 @@ describe("Tooltip", () => {
     expect(screen.getByRole("tooltip")).toBeInTheDocument();
     expect(document.querySelector('[data-slot="tooltip-arrow"]')).not.toBeNull();
   });
+
+  it("respects offset={0} instead of falling back to the default offset", async () => {
+    render(
+      <Tooltip delay={0}>
+        <Button>Flush</Button>
+        <Tooltip.Content offset={0}>Flush tip</Tooltip.Content>
+      </Tooltip>,
+    );
+
+    await user.hover(screen.getByRole("button", {name: "Flush"}));
+    await act(async () => {
+      vi.advanceTimersByTime(0);
+    });
+
+    // With a zero-size trigger at the origin, a top placement puts the tooltip's
+    // bottom edge exactly `offset` pixels away from the trigger.
+    expect(screen.getByRole("tooltip").style.bottom).toBe("0px");
+  });
 });

@@ -116,7 +116,7 @@ const TooltipContent = ({
   ...props
 }: TooltipContentProps) => {
   const {slots} = use(TooltipContext);
-  const offset = offsetProp ? offsetProp : showArrow ? 7 : 3;
+  const offset = offsetProp ?? (showArrow ? 7 : 3);
 
   return (
     <TooltipPrimitive
