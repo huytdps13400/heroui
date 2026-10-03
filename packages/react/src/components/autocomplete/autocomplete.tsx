@@ -304,6 +304,7 @@ interface AutocompleteClearButtonProps<
 }
 
 const AutocompleteClearButton = <E extends keyof React.JSX.IntrinsicElements = "button">({
+  children,
   className,
   onClick,
   ref,
@@ -348,7 +349,7 @@ const AutocompleteClearButton = <E extends keyof React.JSX.IntrinsicElements = "
       onClick={handleClick}
       {...(props as any)}
     >
-      <CloseIcon data-slot="autocomplete-clear-button-icon" />
+      {children ?? <CloseIcon data-slot="autocomplete-clear-button-icon" />}
     </dom.button>
   );
 };

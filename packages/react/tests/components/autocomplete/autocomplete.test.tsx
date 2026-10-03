@@ -1,4 +1,5 @@
 import type {Key} from "@react-types/shared";
+import type {ReactNode} from "react";
 
 import {User, cleanup, render, runAllTimers, screen, setupUser} from "@heroui/testing/helpers";
 import {useFilter} from "react-aria-components/Autocomplete";
@@ -25,6 +26,7 @@ const AutocompleteExample = (props: {
   onChange?: (key: Key | null) => void;
   onClear?: () => void;
   withClearButton?: boolean;
+  clearButtonIcon?: ReactNode;
 }) => {
   const {contains} = useFilter({sensitivity: "base"});
 
@@ -43,7 +45,9 @@ const AutocompleteExample = (props: {
       <Label>Favorite Animal</Label>
       <Autocomplete.Trigger>
         <Autocomplete.Value />
-        {props.withClearButton ? <Autocomplete.ClearButton /> : null}
+        {props.withClearButton ? (
+          <Autocomplete.ClearButton>{props.clearButtonIcon}</Autocomplete.ClearButton>
+        ) : null}
         <Autocomplete.Indicator />
       </Autocomplete.Trigger>
       <Autocomplete.Popover>
@@ -146,6 +150,21 @@ describe("Autocomplete", () => {
     runAllTimers();
 
     expect(onClear).toHaveBeenCalledTimes(1);
+  });
+
+  it("renders custom ClearButton children instead of the default icon", () => {
+    render(
+      <AutocompleteExample
+        withClearButton
+        clearButtonIcon={<span data-testid="custom-clear-icon">x</span>}
+        defaultValue="cat"
+      />,
+    );
+
+    const clearButton = document.querySelector('[data-slot="autocomplete-clear-button"]');
+
+    expect(clearButton).toContainElement(screen.getByTestId("custom-clear-icon"));
+    expect(clearButton?.querySelector('[data-slot="autocomplete-clear-button-icon"]')).toBeNull();
   });
 
   it("supports disabled state", async () => {
