@@ -118,6 +118,35 @@ describe("InputOTP", () => {
     expect(screen.getByText("Invalid code")).toBeInTheDocument();
   });
 
+  it("exposes the invalid state to assistive technology", () => {
+    const {rerender} = render(
+      <InputOTP isInvalid aria-label="Verification code" maxLength={6}>
+        <InputOTP.Group>
+          <InputOTP.Slot index={0} />
+          <InputOTP.Slot index={1} />
+        </InputOTP.Group>
+      </InputOTP>,
+    );
+
+    expect(screen.getByRole("textbox", {name: "Verification code"})).toHaveAttribute(
+      "aria-invalid",
+      "true",
+    );
+
+    rerender(
+      <InputOTP aria-label="Verification code" maxLength={6}>
+        <InputOTP.Group>
+          <InputOTP.Slot index={0} />
+          <InputOTP.Slot index={1} />
+        </InputOTP.Group>
+      </InputOTP>,
+    );
+
+    expect(screen.getByRole("textbox", {name: "Verification code"})).not.toHaveAttribute(
+      "aria-invalid",
+    );
+  });
+
   it("supports filling slots from paste", async () => {
     const onChange = vi.fn();
 
