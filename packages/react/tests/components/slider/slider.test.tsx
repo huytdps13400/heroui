@@ -3,6 +3,7 @@ import type {ComponentProps} from "react";
 import {act, render, screen, setupUser} from "@heroui/testing/helpers";
 
 import {Label} from "@/components/label";
+import {I18nProvider} from "@/components/rac";
 import {Slider} from "@/components/slider";
 
 const renderSlider = (props: Partial<ComponentProps<typeof Slider>> = {}) =>
@@ -234,6 +235,64 @@ describe("Slider", () => {
 
       expect(track).not.toHaveAttribute("data-fill-start", "true");
       expect(track).not.toHaveAttribute("data-fill-end", "true");
+    });
+  });
+
+  describe("fill position", () => {
+    const getFill = () => document.querySelector<HTMLElement>('[data-slot="slider-fill"]')!;
+    const getThumbs = () =>
+      Array.from(document.querySelectorAll<HTMLElement>('[data-slot="slider-thumb"]'));
+
+    it("renders the fill from the start edge to the thumb in LTR", () => {
+      renderSlider({defaultValue: 30});
+
+      expect(getFill()).toHaveStyle({left: "0%", width: "30%"});
+      expect(getThumbs()[0]).toHaveStyle({left: "30%"});
+    });
+
+    it("renders the fill from the start edge to the thumb in RTL", () => {
+      render(
+        <I18nProvider locale="ar-EG">
+          <Slider defaultValue={30}>
+            <Label>Volume</Label>
+            <Slider.Track>
+              <Slider.Fill />
+              <Slider.Thumb />
+            </Slider.Track>
+          </Slider>
+        </I18nProvider>,
+      );
+
+      // React Aria mirrors the thumb in RTL (30% from the right edge = left: 70%), so the fill
+      // has to cover the right-hand 30% of the track to end at the thumb.
+      expect(getThumbs()[0]).toHaveStyle({left: "70%"});
+      expect(getFill()).toHaveStyle({left: "70%", width: "30%"});
+    });
+
+    it("renders the range fill between both thumbs in RTL", () => {
+      render(
+        <I18nProvider locale="ar-EG">
+          <Slider defaultValue={[100, 500]} maxValue={1000} minValue={0}>
+            <Label>Price Range</Label>
+            <Slider.Track>
+              {({state}) => (
+                <>
+                  <Slider.Fill />
+                  {state.values.map((_, i) => (
+                    <Slider.Thumb key={i} index={i} />
+                  ))}
+                </>
+              )}
+            </Slider.Track>
+          </Slider>
+        </I18nProvider>,
+      );
+
+      const [startThumb, endThumb] = getThumbs();
+
+      expect(startThumb).toHaveStyle({left: "90%"});
+      expect(endThumb).toHaveStyle({left: "50%"});
+      expect(getFill()).toHaveStyle({left: "50%", width: "40%"});
     });
   });
 });
