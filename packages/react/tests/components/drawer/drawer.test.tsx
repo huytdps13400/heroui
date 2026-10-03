@@ -1,5 +1,14 @@
-import {User, cleanup, render, runAllTimers, screen, setupUser} from "@heroui/testing/helpers";
+import {
+  User,
+  cleanup,
+  fireEvent,
+  render,
+  runAllTimers,
+  screen,
+  setupUser,
+} from "@heroui/testing/helpers";
 
+import {Drawer} from "@/components/drawer";
 import {isDrawerDragTargetOwnedBy} from "@/components/drawer/drawer.utils";
 
 import {DrawerFixture, StackedDrawerFixture} from "./fixtures";
@@ -158,5 +167,37 @@ describe("Drawer", () => {
 
     expect(isDrawerDragTargetOwnedBy(childHandle, childDialog)).toBe(true);
     expect(isDrawerDragTargetOwnedBy(childHandle, parentDialog)).toBe(false);
+  });
+
+  it("keeps drag-to-dismiss working when Drawer.Dialog receives pointer handlers", () => {
+    const onPointerDown = vi.fn();
+    const onPointerMove = vi.fn();
+
+    render(
+      <Drawer defaultOpen>
+        <Drawer.Backdrop>
+          <Drawer.Content placement="bottom">
+            <Drawer.Dialog onPointerDown={onPointerDown} onPointerMove={onPointerMove}>
+              <Drawer.Handle data-testid="drawer-handle" />
+              <Drawer.Heading>Drawer Title</Drawer.Heading>
+            </Drawer.Dialog>
+          </Drawer.Content>
+        </Drawer.Backdrop>
+      </Drawer>,
+    );
+    runAllTimers();
+
+    const dialog = screen.getByRole("dialog");
+    const handle = screen.getByTestId("drawer-handle");
+
+    // jsdom does not implement pointer capture.
+    dialog.setPointerCapture = vi.fn();
+
+    fireEvent.pointerDown(handle, {button: 0, clientY: 100, pointerId: 1});
+    fireEvent.pointerMove(handle, {clientY: 160, pointerId: 1});
+
+    expect(onPointerDown).toHaveBeenCalledTimes(1);
+    expect(onPointerMove).toHaveBeenCalledTimes(1);
+    expect(dialog.style.transform).toBe("translateY(60px)");
   });
 });

@@ -196,15 +196,14 @@ function useDrawerDrag(placement: DrawerPlacement | undefined, isDismissable: bo
     [isVertical, overlayState],
   );
 
+  const dragHandlers: Pick<
+    React.DOMAttributes<HTMLElement>,
+    "onPointerDown" | "onPointerMove" | "onPointerUp"
+  > = isDismissable ? {onPointerDown, onPointerMove, onPointerUp} : {};
+
   return {
     dialogRef,
-    dragHandlers: isDismissable
-      ? {
-          onPointerDown,
-          onPointerMove,
-          onPointerUp,
-        }
-      : {},
+    dragHandlers,
   };
 }
 
@@ -375,8 +374,8 @@ const DrawerDialog = ({children, className, ...props}: DrawerDialogProps) => {
         data-placement={placement}
         data-slot="drawer-dialog"
         style={isDismissable ? {touchAction: "none"} : undefined}
-        {...dragHandlers}
-        {...props}
+        // Chain user pointer handlers with the drag handlers instead of replacing them.
+        {...mergeProps(dragHandlers, props)}
       >
         {children}
       </DialogPrimitive>
