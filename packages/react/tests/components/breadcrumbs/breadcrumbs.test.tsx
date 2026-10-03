@@ -105,4 +105,46 @@ describe("Breadcrumbs", () => {
     // The render function replaces the whole item, so no Link or separator is added for it.
     expect(screen.queryByRole("link", {name: "Home"})).toBeNull();
   });
+
+  it("passes the breadcrumb render props to item children render functions", () => {
+    render(
+      <Breadcrumbs>
+        <Breadcrumbs.Item href="#home">
+          {({isCurrent}) => <span data-testid="home">{isCurrent ? "current" : "not current"}</span>}
+        </Breadcrumbs.Item>
+        <Breadcrumbs.Item>
+          {({isCurrent}) => (
+            <span data-testid="laptop">{isCurrent ? "current" : "not current"}</span>
+          )}
+        </Breadcrumbs.Item>
+      </Breadcrumbs>,
+    );
+
+    expect(screen.getByTestId("home")).toHaveTextContent(/^not current$/);
+    expect(screen.getByTestId("laptop")).toHaveTextContent(/^current$/);
+  });
+
+  it("applies item-level render and style to the item only, not to the inner link", () => {
+    render(
+      <Breadcrumbs>
+        <Breadcrumbs.Item
+          href="#home"
+          render={(props) => <li {...(props as any)} data-custom="bar" />}
+          style={{color: "red"}}
+        >
+          Home
+        </Breadcrumbs.Item>
+        <Breadcrumbs.Item>Laptop</Breadcrumbs.Item>
+      </Breadcrumbs>,
+    );
+
+    const link = screen.getByRole("link", {name: "Home"});
+    const item = link.closest('[data-slot="breadcrumbs-item"]');
+
+    expect(link.tagName).toBe("A");
+    expect(link).not.toHaveAttribute("data-custom");
+    expect(link).not.toHaveAttribute("style");
+    expect(item).toHaveAttribute("data-custom", "bar");
+    expect(item).toHaveStyle({color: "rgb(255, 0, 0)"});
+  });
 });

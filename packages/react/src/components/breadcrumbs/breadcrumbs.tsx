@@ -59,8 +59,10 @@ interface BreadcrumbsItemProps extends ComponentPropsWithRef<typeof BreadcrumbPr
 const BreadcrumbsItem = ({
   children,
   className,
+  render,
+  style,
   ...props
-}: BreadcrumbsItemProps & Omit<LinkProps, "className">) => {
+}: BreadcrumbsItemProps & Omit<LinkProps, "children" | "className" | "render" | "style">) => {
   const {separator, slots} = use(BreadcrumbsContext);
 
   const renderSeparator = () => {
@@ -87,11 +89,15 @@ const BreadcrumbsItem = ({
     <BreadcrumbPrimitive
       className={composeTwRenderProps(className, slots?.item())}
       data-slot="breadcrumbs-item"
+      render={render}
+      style={style}
       {...props}
     >
-      {({isCurrent}) => {
+      {(renderProps) => {
+        const {isCurrent} = renderProps;
+
         if (typeof children === "function") {
-          return children({} as any);
+          return children(renderProps);
         }
 
         return (
