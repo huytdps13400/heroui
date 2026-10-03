@@ -115,11 +115,7 @@ const NumberFieldIncrementButton = ({
       slot="increment"
       {...props}
     >
-      {children && React.isValidElement(children) ? (
-        children
-      ) : (
-        <IconPlus data-slot="number-field-increment-button-icon" />
-      )}
+      {children || <IconPlus data-slot="number-field-increment-button-icon" />}
     </ButtonPrimitive>
   );
 };
@@ -145,11 +141,7 @@ const NumberFieldDecrementButton = ({
       slot="decrement"
       {...props}
     >
-      {children && React.isValidElement(children) ? (
-        children
-      ) : (
-        <IconMinus data-slot="number-field-decrement-button-icon" />
-      )}
+      {children || <IconMinus data-slot="number-field-decrement-button-icon" />}
     </ButtonPrimitive>
   );
 };

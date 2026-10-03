@@ -175,6 +175,52 @@ describe("NumberField", () => {
     expect(onChange).not.toHaveBeenCalled();
   });
 
+  it("renders non-element children of the stepper buttons instead of the default icons", () => {
+    render(
+      <NumberField defaultValue={10} name="width">
+        <Label>Width</Label>
+        <NumberField.Group>
+          <NumberField.DecrementButton>-</NumberField.DecrementButton>
+          <NumberField.Input />
+          <NumberField.IncrementButton>
+            <span>Up</span>
+            <span>(+1)</span>
+          </NumberField.IncrementButton>
+        </NumberField.Group>
+      </NumberField>,
+    );
+
+    const decrement = document.querySelector(
+      '[data-slot="number-field-decrement-button"]',
+    ) as HTMLElement;
+    const increment = document.querySelector(
+      '[data-slot="number-field-increment-button"]',
+    ) as HTMLElement;
+
+    expect(decrement).toHaveTextContent("-");
+    expect(decrement.querySelector('[data-slot="number-field-decrement-button-icon"]')).toBeNull();
+    expect(increment).toHaveTextContent("Up(+1)");
+    expect(increment.querySelector('[data-slot="number-field-increment-button-icon"]')).toBeNull();
+  });
+
+  it("supports render-function children on the stepper buttons", () => {
+    render(
+      <NumberField defaultValue={10} maxValue={10} name="width">
+        <Label>Width</Label>
+        <NumberField.Group>
+          <NumberField.Input />
+          <NumberField.IncrementButton>
+            {({isDisabled}) => (isDisabled ? "At max" : "Increase")}
+          </NumberField.IncrementButton>
+        </NumberField.Group>
+      </NumberField>,
+    );
+
+    expect(document.querySelector('[data-slot="number-field-increment-button"]')).toHaveTextContent(
+      "At max",
+    );
+  });
+
   it("supports disabled state", async () => {
     const onChange = vi.fn();
 
