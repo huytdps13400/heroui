@@ -1,4 +1,5 @@
 import {act, cleanup, render, runAllTimers, screen, setupUser} from "@heroui/testing/helpers";
+import {createRef} from "react";
 
 import {Button} from "@/components/button";
 import {Tooltip} from "@/components/tooltip";
@@ -128,5 +129,33 @@ describe("Tooltip", () => {
 
     expect(screen.getByRole("tooltip")).toBeInTheDocument();
     expect(document.querySelector('[data-slot="tooltip-arrow"]')).not.toBeNull();
+  });
+
+  it("forwards a ref on Tooltip.Trigger and still positions the tooltip against it", async () => {
+    const ref = createRef<HTMLDivElement>();
+
+    render(
+      <Tooltip delay={0}>
+        <Tooltip.Trigger ref={ref} aria-label="Info">
+          <span>i</span>
+        </Tooltip.Trigger>
+        <Tooltip.Content>Ref tip</Tooltip.Content>
+      </Tooltip>,
+    );
+
+    const trigger = screen.getByRole("button", {name: "Info"});
+
+    expect(ref.current).toBe(trigger);
+
+    await user.hover(trigger);
+    await act(async () => {
+      vi.advanceTimersByTime(0);
+    });
+
+    const tooltip = screen.getByRole("tooltip");
+
+    // React Aria only computes a placement once it can measure the trigger element.
+    expect(tooltip).toHaveAttribute("data-placement", "top");
+    expect(tooltip.style.position).toBe("absolute");
   });
 });

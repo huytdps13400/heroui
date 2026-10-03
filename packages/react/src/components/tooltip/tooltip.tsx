@@ -5,8 +5,8 @@ import type {TooltipVariants} from "@heroui/styles";
 import type {ComponentPropsWithRef, ReactNode} from "react";
 
 import {tooltipVariants} from "@heroui/styles";
-import {mergeProps} from "@react-aria/utils";
-import React, {createContext, use, useRef} from "react";
+import {mergeProps, mergeRefs} from "@react-aria/utils";
+import React, {createContext, use, useMemo, useRef} from "react";
 import {useFocusable} from "react-aria/useFocusable";
 import {
   OverlayArrow,
@@ -186,10 +186,14 @@ interface TooltipTriggerProps<
 const TooltipTrigger = <E extends keyof React.JSX.IntrinsicElements = "div">({
   children,
   className,
+  ref,
   ...props
 }: TooltipTriggerProps<E> & Omit<React.JSX.IntrinsicElements[E], keyof TooltipTriggerProps<E>>) => {
   const {slots} = use(TooltipContext);
   const triggerRef = useRef<HTMLElement | null>(null);
+  // `ref` is pulled out of the spread props so a user ref cannot replace `triggerRef`,
+  // which React Aria measures to position the tooltip.
+  const mergedRef = useMemo(() => mergeRefs(triggerRef, ref as React.Ref<HTMLElement>), [ref]);
   // Use the `useFocusable` hook directly rather than the `<Focusable>` wrapper component.
   // Both consume the FocusableContext provided by TooltipTriggerPrimitive's internal
   // <FocusableProvider> (which carries the tooltip trigger props + triggerRef) and produce
@@ -202,7 +206,7 @@ const TooltipTrigger = <E extends keyof React.JSX.IntrinsicElements = "div">({
 
   return (
     <dom.div
-      ref={triggerRef as unknown as React.Ref<HTMLDivElement>}
+      ref={mergedRef as unknown as React.Ref<HTMLDivElement>}
       className={composeSlotClassName(slots?.trigger, className)}
       data-slot="tooltip-trigger"
       role="button"
