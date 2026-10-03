@@ -7,11 +7,13 @@ import {fieldsetVariants} from "@heroui/styles";
 import React, {createContext, use} from "react";
 import {
   ButtonContext,
+  CheckboxFieldContext,
   CheckboxGroupContext,
   LinkContext,
   Provider,
   RadioGroupContext,
   SliderContext,
+  SwitchFieldContext,
   ToggleButtonContext,
   ToggleButtonGroupContext,
 } from "react-aria-components";
@@ -78,10 +80,12 @@ const FieldsetRoot = <E extends keyof React.JSX.IntrinsicElements = "fieldset">(
           <Provider
             values={[
               [ButtonContext, {isDisabled: true}],
+              [CheckboxFieldContext, {isDisabled: true}],
               [CheckboxGroupContext, {isDisabled: true}],
               [LinkContext, {isDisabled: true}],
               [RadioGroupContext, {isDisabled: true}],
               [SliderContext, {isDisabled: true}],
+              [SwitchFieldContext, {isDisabled: true}],
               [ToggleButtonContext, {isDisabled: true}],
               [ToggleButtonGroupContext, {isDisabled: true}],
             ]}

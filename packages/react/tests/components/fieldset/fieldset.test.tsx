@@ -1,6 +1,9 @@
 import {render, screen} from "@heroui/testing/helpers";
 
+import {Checkbox} from "@/components/checkbox";
 import {Fieldset} from "@/components/fieldset";
+import {Label} from "@/components/label";
+import {Switch} from "@/components/switch";
 
 describe("Fieldset", () => {
   it("renders composed legend and fields", () => {
@@ -47,6 +50,46 @@ describe("Fieldset", () => {
     );
 
     expect(screen.getByTestId("fieldset")).toHaveAttribute("data-disabled", "true");
+  });
+
+  it("forwards the disabled state to a standalone Checkbox", () => {
+    render(
+      <Fieldset disabled>
+        <Checkbox data-testid="checkbox">
+          {({isDisabled}) => (
+            <Checkbox.Content>
+              <Checkbox.Control>
+                <Checkbox.Indicator />
+              </Checkbox.Control>
+              <Label>{isDisabled ? "Disabled" : "Enabled"}</Label>
+            </Checkbox.Content>
+          )}
+        </Checkbox>
+      </Fieldset>,
+    );
+
+    expect(screen.getByTestId("checkbox")).toHaveAttribute("data-disabled", "true");
+    expect(screen.getByText("Disabled")).toBeInTheDocument();
+  });
+
+  it("forwards the disabled state to a Switch", () => {
+    render(
+      <Fieldset disabled>
+        <Switch data-testid="switch">
+          {({isDisabled}) => (
+            <Switch.Content>
+              <Switch.Control>
+                <Switch.Thumb />
+              </Switch.Control>
+              <Label>{isDisabled ? "Disabled" : "Enabled"}</Label>
+            </Switch.Content>
+          )}
+        </Switch>
+      </Fieldset>,
+    );
+
+    expect(screen.getByTestId("switch")).toHaveAttribute("data-disabled", "true");
+    expect(screen.getByText("Disabled")).toBeInTheDocument();
   });
 
   describe("composition", () => {
