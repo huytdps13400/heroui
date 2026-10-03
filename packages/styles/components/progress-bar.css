@@ -54,6 +54,9 @@
 
       animation: progress-bar-indeterminate 1.5s cubic-bezier(0.65, 0, 0.35, 1) infinite;
 
+      /* The fill is anchored to the inline-start edge, so mirror the sweep in RTL */
+      @apply rtl:[animation-name:progress-bar-indeterminate-rtl];
+
       @apply motion-reduce:animate-none;
     }
   }
@@ -80,6 +83,15 @@
   }
   100% {
     transform: translateX(350%);
+  }
+}
+
+@keyframes progress-bar-indeterminate-rtl {
+  0% {
+    transform: translateX(100%);
+  }
+  100% {
+    transform: translateX(-350%);
   }
 }
 
