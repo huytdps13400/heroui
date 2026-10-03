@@ -116,9 +116,11 @@
 /**
  * Modifier: content--left
  * Slides in from the left edge
+ * `left`/`right` are physical placements (the slide translate and drag axis are physical),
+ * so flip the logical flex alignment in RTL to keep the panel on the same physical edge.
  */
 .drawer__content--left {
-  @apply justify-start;
+  @apply justify-start rtl:justify-end;
 }
 
 /**
@@ -126,7 +128,7 @@
  * Slides in from the right edge
  */
 .drawer__content--right {
-  @apply justify-end;
+  @apply justify-end rtl:justify-start;
 }
 
 /**
